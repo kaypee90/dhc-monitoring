@@ -1,0 +1,32 @@
+---
+version: "3"
+
+services:
+  collector:
+    image: kaypee90/dhc-collector:0.1.0
+    command: >
+     bash -c "python manage.py migrate &&
+              python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./:/code/
+    environment:
+      - DJ_SECRET_KEY=k5mx0y3pev1z_kjwwert
+      - DJ_DEBUG=true
+    expose:
+      - "8000"
+    ports:
+      - 8000:8000
+
+  web:
+    image: kaypee90/dhc-web:0.1.0
+    command: npm start
+    volumes:
+      - ./frontend/app:/app
+    environment:
+      - API_BASE_URL=http://collector:8000/v1
+    expose:
+      - "3000"
+    ports:
+      - 3000:3000
+    depends_on:
+      - collector
